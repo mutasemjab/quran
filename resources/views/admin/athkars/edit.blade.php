@@ -116,44 +116,5 @@
 @endsection
 
 
-@section('script')
-  <script>
-    $(document).ready(function() {
-        function loadLessons(classIds) {
-            $.ajax({
-                url: "{{ route('get.lessons.by.classes') }}",
-                type: "GET",
-                data: { class_ids: classIds },
-                success: function(data) {
-                    $('#lesson_id').empty();
-                    $.each(data, function(key, lesson) {
-                        $('#lesson_id').append(
-                            `<option value="${lesson.id}" ${@json($teacherLessons)}.includes(lesson.id) ? 'selected' : ''}>${lesson.name}</option>`
-                        );
-                    });
-                },
-                error: function() {
-                    alert('Failed to load lessons');
-                }
-            });
-        }
-
-        // Initial load for already selected classes
-        let selectedClasses = $('#clas_id').val();
-        if (selectedClasses.length > 0) {
-            loadLessons(selectedClasses);
-        }
-
-        // Load lessons on class selection change
-        $('#clas_id').on('change', function() {
-            let selectedClasses = $(this).val();
-            if (selectedClasses.length > 0) {
-                loadLessons(selectedClasses);
-            } else {
-                $('#lesson_id').empty();
-            }
-        });
-    });
-</script>
 
 @endsection

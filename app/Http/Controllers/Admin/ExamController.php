@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Clas;
 use App\Models\Exam;
-use App\Models\Lesson;
 use App\Models\Question;
 use Illuminate\Http\Request;
 

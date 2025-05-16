@@ -16,8 +16,8 @@ class ClassDate extends Model
         return $this->belongsTo(Clas::class, 'clas_id');
     }
 
-    public function lessons()
+    public function lectures()
     {
-        return $this->hasMany(ClassDateLesson::class, 'class_date_id');
+        return $this->hasMany(LectureClassDate::class, 'class_date_id');
     }
 }

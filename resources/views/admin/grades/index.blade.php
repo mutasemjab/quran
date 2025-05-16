@@ -21,7 +21,7 @@
                         <table id="example2" class="table table-bordered table-hover">
                             <thead class="custom_thead">
                                 <th>{{ __('messages.Name of class') }}</th>
-                                <th>{{ __('messages.Name of lesson') }}</th>
+                                <th>{{ __('messages.Name of lecture') }}</th>
                                 <th>{{ __('messages.Name of student') }}</th>
                                 <th>{{ __('messages.Name') }}</th>
                                 <th>{{ __('messages.grade') }}</th>
@@ -31,7 +31,7 @@
                                 @foreach ($data as $info)
                                     <tr>
                                         <td>{{ $info->clas->name }}</td>
-                                        <td>{{ $info->lesson->name }}</td>
+                                        <td>{{ $info->lecture->name }}</td>
                                         <td>{{ $info->user->name }}</td>
                                         <td>{{ $info->name }}</td>
                                         <td>{{ $info->grade ?? null  }}</td>

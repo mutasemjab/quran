@@ -106,22 +106,6 @@
 
 
 
-
-
-              <!-- @if (
-                $user->can('lesson-table') ||
-                $user->can('lesson-add') ||
-                $user->can('lesson-edit') ||
-                $user->can('lesson-delete'))
-                <li class="nav-item">
-                    <a href="{{ route('lessons.index') }}" class="nav-link">
-                        <i class="far fa-circle nav-icon"></i>
-                        <p> {{__('messages.lessons')}} </p>
-                    </a>
-                </li>
-                @endif -->
-
-
                 @if (
                     $user->can('seera-table') ||
                     $user->can('seera-add') ||

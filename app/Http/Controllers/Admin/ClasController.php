@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Clas;
 use App\Models\ClassDate;
-use App\Models\ClassDateLesson;
-use App\Models\Lesson;
 use Illuminate\Http\Request;
 
 class ClasController extends Controller
@@ -131,7 +129,7 @@ class ClasController extends Controller
             if (auth()->user()->can('class-edit')) {
                 $classDate = ClassDate::findOrFail($id);
 
-                // Delete the date and associated lessons
+                // Delete the date and associated 
                 $classDate->delete();
 
                 return redirect()->back()->with('success', 'Weekly date removed successfully');

@@ -144,7 +144,7 @@ class AuthController extends Controller
             'user_type' => $data['user_type'],
             'phone' => $data['phone'] ?? null,
             'photo' => $photoPath,
-            'activate' => 2,
+            'activate' => 1,
         ]);
 
         // Add additional data for teachers or parents

@@ -9,6 +9,7 @@ use App\Models\ClassLesson;
 use App\Models\ClassTeacher;
 use App\Models\Lecture;
 use App\Models\Clas;
+use App\Models\LectureClassDate;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -27,20 +28,20 @@ class ClasController extends Controller
    public function getNextLessonDate(Request $request)
     {
         $request->validate([
-            'lesson_id' => 'required|exists:lessons,id',
+            'lecture_id' => 'required|exists:lectures,id',
         ]);
     
         $today = now()->toDateString();
     
         // Get the closest future date for the specified lesson
-        $nextDate = ClassDateLesson::where('lesson_id', $request->lesson_id)
+        $nextDate = LectureClassDate::where('lesson_id', $request->lesson_id)
             ->whereHas('classDate', function ($query) use ($today) {
                 $query->where('week_date', '>=', $today);
             })
             ->with('classDate')
-            ->join('class_dates', 'class_date_lessons.class_date_id', '=', 'class_dates.id') // Ensure proper join
+            ->join('class_dates', 'lecture_class_dates.class_date_id', '=', 'class_dates.id') // Ensure proper join
             ->orderBy('class_dates.week_date', 'asc') // Correct table alias
-            ->select('class_date_lessons.*') // Avoid ambiguous column references
+            ->select('lecture_class_dates.*') // Avoid ambiguous column references
             ->first();
     
         if (!$nextDate) {
@@ -56,17 +57,17 @@ class ClasController extends Controller
     public function getAllLessonDates(Request $request)
     {
         $request->validate([
-            'lesson_id' => 'required|exists:lessons,id',
+            'lecture_id' => 'required|exists:lectures,id',
         ]);
 
-        // Get all dates for the specified lesson
-        $dates = ClassDateLesson::where('lesson_id', $request->lesson_id)
+        // Get all dates for the specified lecture
+        $dates = LectureClassDate::where('lecture_id', $request->lecture_id)
             ->with('classDate')
             ->get()
             ->pluck('classDate.week_date');
 
         if ($dates->isEmpty()) {
-            return response(['message' => 'No dates found for this lesson'], 404);
+            return response(['message' => 'No dates found for this lecture'], 404);
         }
 
         return response([
@@ -74,25 +75,6 @@ class ClasController extends Controller
         ], 200);
     }
 
-    public function getLessonLectures(Request $request)
-    {
-        $request->validate([
-            'lesson_id' => 'required|exists:lessons,id',
-        ]);
-
-        // Retrieve lectures for the specified lesson
-        $lectures = Lecture::where('lesson_id', $request->lesson_id)
-            ->get()
-            ->groupBy('type');
-
-        if ($lectures->isEmpty()) {
-            return response(['message' => 'No lectures found for this lesson'], 404);
-        }
-
-        return response([
-            'lectures' => $lectures,
-        ], 200);
-    }
 
 
     

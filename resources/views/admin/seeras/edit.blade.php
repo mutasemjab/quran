@@ -58,7 +58,17 @@
                             @enderror
                         </div>
                     </div>
-                                 
+
+                    <div class="form-group">
+                        <label for="classes">Classes</label>
+                        <select name="classes[]" id="classes" class="form-control select2" multiple>
+                            @foreach($classes as $class)
+                                <option value="{{ $class->id }}" {{ in_array($class->id, $selectedClasses) ? 'selected' : '' }}>
+                                    {{ $class->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
                     <div class="col-md-12">
                         <div class="form-group text-center">
@@ -83,5 +93,10 @@
 @endsection
 
 
-
+@section('script')
+<script>
+    $(document).ready(function() {
+        $('.select2').select2();
+    });
+</script>
 @endsection

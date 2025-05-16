@@ -49,7 +49,14 @@
                         </div>
                     </div>
                    
-                    
+                    <div class="form-group">
+                        <label for="classes">Classes</label>
+                        <select name="classes[]" id="classes" class="form-control select2" multiple>
+                            @foreach($classes as $class)
+                                <option value="{{ $class->id }}">{{ $class->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
                     <div class="col-md-12">
                         <div class="form-group text-center">
@@ -76,21 +83,8 @@
 
 @section('script')
 <script>
-    function previewImage() {
-      var preview = document.getElementById('image-preview');
-      var input = document.getElementById('Item_img');
-      var file = input.files[0];
-      if (file) {
-      preview.style.display = "block";
-      var reader = new FileReader();
-      reader.onload = function() {
-        preview.src = reader.result;
-      }
-      reader.readAsDataURL(file);
-    }else{
-        preview.style.display = "none";
-    }
-    }
+    $(document).ready(function() {
+        $('.select2').select2();
+    });
 </script>
-
 @endsection

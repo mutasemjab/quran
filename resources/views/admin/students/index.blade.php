@@ -74,11 +74,7 @@
                                                     {{ __('messages.Edit') }}
                                                 </a>
                                             @endcan
-                                            
-                                                <a href="{{ route('students.show', $info->id) }}" class="btn btn-sm btn-secondary">
-                                                    {{ __('messages.Show') }}
-                                                </a>
-                                            
+                                                                              
                                         </td>
                                     </tr>
                                 @endforeach

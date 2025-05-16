@@ -48,25 +48,28 @@ class ClasController extends Controller
     }
 
 
-    public function getAllLessonDates(Request $request)
+    public function getAllLectures($classId)
     {
-        $request->validate([
-            'lecture_id' => 'required|exists:lectures,id',
-        ]);
-
-        // Get all dates for the specified lecture
-        $dates = LectureClassDate::where('lecture_id', $request->lecture_id)
-            ->with('classDate')
-            ->get()
-            ->pluck('classDate.week_date');
-
-        if ($dates->isEmpty()) {
-            return response(['message' => 'No dates found for this lecture'], 404);
+        $lectures = LectureClassDate::getAllLecturesForClass($classId);
+        
+        if ($lectures->count() > 0) {
+            return response()->json([
+                'success' => true,
+                'lectures' => $lectures->map(function($lectureDate) {
+                    return [
+                        'lecture_date_id' => $lectureDate->id,
+                        'date' => $lectureDate->formatted_date,
+                        'lecture' => $lectureDate->lecture,
+                        'is_past' => \Carbon\Carbon::parse($lectureDate->date)->isPast()
+                    ];
+                })
+            ]);
         }
-
-        return response([
-            'dates' => $dates,
-        ], 200);
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'No lectures found for this class'
+        ]);
     }
 
 

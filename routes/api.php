@@ -73,7 +73,7 @@ Route::group(['prefix' => 'v1/user'], function () {
 
         // CLASSES AND LESSONS
         Route::get('/next-lecture/{classId}', [ClasController::class, 'getNextLecture']);
-        Route::post('/lesson/all-dates', [ClasController::class, 'getAllLessonDates']);
+        Route::get('/class/{classId}/lectures', [ClasController::class, 'getAllLectures']);
         Route::post('/lesson/lectures', [ClasController::class, 'getLessonLectures']);
          Route::get('/classess', [ClasController::class, 'getClassess']);
 

@@ -38,5 +38,15 @@ class LectureClassDate extends Model
             ->orderBy('date', 'asc')
             ->first();
     }
+    public static function getAllLecturesForClass($classId)
+    {
+        $today = \Carbon\Carbon::now()->format('Y-m-d');
+        return self::with('lecture')
+            ->where('class_id', $classId)
+            ->where('date', '>=', $today)
+            ->orderBy('date', 'asc')
+            ->get();
+    }
+
 
 }

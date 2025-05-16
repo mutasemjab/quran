@@ -72,7 +72,7 @@ Route::group(['prefix' => 'v1/user'], function () {
         Route::delete('/grades/{id}', [TeacherController::class, 'destroy']);
 
         // CLASSES AND LESSONS
-        Route::post('/lesson/next-date', [ClasController::class, 'getNextLessonDate']);
+        Route::post('/lesson/next-date', [ClasController::class, 'getNextLecture']);
         Route::post('/lesson/all-dates', [ClasController::class, 'getAllLessonDates']);
         Route::post('/lesson/lectures', [ClasController::class, 'getLessonLectures']);
          Route::get('/classess', [ClasController::class, 'getClassess']);

@@ -16,10 +16,9 @@ return new class extends Migration
         Schema::create('lectures', function (Blueprint $table) {
             $table->id();
             $table->tinyInteger('type')->default(1); // 1 quran //2 hadeth // 3 manhag
-            $table->text('content');
+            $table->text('content_student');
+            $table->text('content_teacher');
             $table->text('video')->nullable();
-            $table->unsignedBigInteger('lesson_id');
-            $table->foreign('lesson_id')->references('id')->on('lessons')->onDelete('cascade');
             $table->timestamps();
         });
     }

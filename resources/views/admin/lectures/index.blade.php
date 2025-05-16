@@ -30,8 +30,8 @@
                                 @foreach ($data as $info)
                                     <tr>
                                         <td>{{ $info->id }}</td>
-                                        <td>{{ $info->content_teacher }}</td>
-                                        <td>{{ $info->content_student }}</td>
+                                        <td>{{ $info->content_teacher ?? null}}</td>
+                                        <td>{{ $info->content_student ?? null }}</td>
                                       
                                         <td>
                                             @can('lecture-edit')

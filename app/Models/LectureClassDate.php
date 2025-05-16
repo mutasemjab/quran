@@ -14,6 +14,8 @@ class LectureClassDate extends Model
         'date',
     ];
     
+
+
     public function lecture()
     {
         return $this->belongsTo(Lecture::class, 'lecture_id');
@@ -26,4 +28,15 @@ class LectureClassDate extends Model
     {
         return \Carbon\Carbon::parse($this->date)->format('Y-m-d');
     }
+
+      public static function getNextLecture($classId)
+    {
+        $today = \Carbon\Carbon::now()->format('Y-m-d');
+        
+        return self::where('class_id', $classId)
+            ->where('date', '>=', $today)
+            ->orderBy('date', 'asc')
+            ->first();
+    }
+
 }

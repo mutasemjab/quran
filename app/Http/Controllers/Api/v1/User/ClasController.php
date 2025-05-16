@@ -24,33 +24,27 @@ class ClasController extends Controller
             ], 200);
     }
     
+  
     
-   public function getNextLessonDate(Request $request)
+     public function getNextLecture($classId)
     {
-        $request->validate([
-            'lecture_id' => 'required|exists:lectures,id',
-        ]);
-    
-        $today = now()->toDateString();
-    
-        // Get the closest future date for the specified lesson
-        $nextDate = LectureClassDate::where('lesson_id', $request->lesson_id)
-            ->whereHas('classDate', function ($query) use ($today) {
-                $query->where('week_date', '>=', $today);
-            })
-            ->with('classDate')
-            ->join('class_dates', 'lecture_class_dates.class_date_id', '=', 'class_dates.id') // Ensure proper join
-            ->orderBy('class_dates.week_date', 'asc') // Correct table alias
-            ->select('lecture_class_dates.*') // Avoid ambiguous column references
-            ->first();
-    
-        if (!$nextDate) {
-            return response(['message' => 'No upcoming dates found for this lesson'], 404);
+        $nextLecture = LectureClassDate::getNextLecture($classId);
+        
+        if ($nextLecture) {
+            // Load the related lecture
+            $lecture = $nextLecture->lecture;
+            
+            return response()->json([
+                'success' => true,
+                'next_lecture_date' => $nextLecture->formatted_date,
+                'lecture' => $lecture
+            ]);
         }
-    
-        return response([
-            'next_date' => $nextDate->classDate->week_date,
-        ], 200);
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'No upcoming lectures found for this class'
+        ]);
     }
 
 

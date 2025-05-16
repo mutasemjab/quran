@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Clas;
 use App\Models\Grade;
 use App\Models\Lecture;
-use App\Models\lecture;
 use App\Models\User;
 use Illuminate\Http\Request;
 

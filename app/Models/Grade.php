@@ -20,8 +20,8 @@ class Grade extends Model
        return $this->belongsTo(Clas::class);
     }
    
-    public function lesson()
+    public function lecture()
     {
-       return $this->belongsTo(Lesson::class);
+       return $this->belongsTo(Lecture::class);
     }
 }

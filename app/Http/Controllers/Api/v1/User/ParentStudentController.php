@@ -5,8 +5,7 @@ namespace App\Http\Controllers\Api\v1\User;
 use App\Http\Controllers\Controller;
 use App\Models\Advertisement;
 use App\Models\Attendance;
-use App\Models\ClassDateLesson;
-use App\Models\ClassLesson;
+
 use App\Models\ClassTeacher;
 use App\Models\Homework;
 use App\Models\HomeworkStudent;
@@ -141,7 +140,7 @@ class ParentStudentController extends Controller
         ]);
 
         // Fetch grades for the authenticated user
-        $grades = Grade::with('lesson')->where('user_id', $request->user_id)->get();
+        $grades = Grade::with('lecture')->where('user_id', $request->user_id)->get();
 
         return response()->json(['data' => $grades]);
     }
@@ -212,7 +211,7 @@ class ParentStudentController extends Controller
 
         // Query homeworks for the given class
         $query = Homework::where('clas_id', $request->clas_id)
-            ->with('lesson') // Assuming there's a Lesson relationship
+            ->with('lecture') // Assuming there's a lecture relationship
             ->with(['homeworkStudents' => function ($query) use ($request) {
                 $query->where('user_id', $request->user_id);
             }]);
@@ -240,7 +239,7 @@ class ParentStudentController extends Controller
                 'to' => $homework->to,
                 'description' => $homework->type == 2 ? $homework->description_manhag : ($homework->type == 3 ? $homework->description_extra : null),
                 'status' => $homework->status == 1 ? 'Done' : 'Not Yet',
-                'lesson_id' => $homework->lesson_id,
+                'lecture_id' => $homework->lecture_id,
                 'teacher_id' => $homework->teacher_id,
                 'assigned_to' => $homework->homeworkStudents->pluck('user_id')->toArray(),
             ];

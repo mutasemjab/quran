@@ -69,11 +69,11 @@
             
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="user">{{ __('messages.select_lesson') }}</label>
-                            <select name="lesson" id="lesson" class="form-control" required>
-                                @foreach($lessons as $lesson)
-                                    <option value="{{ $lesson->id }}" @if($lesson->id == $data->lesson_id) selected @endif>
-                                        {{ $lesson->name }}
+                            <label for="user">{{ __('messages.select_lecture') }}</label>
+                            <select name="lecture" id="lecture" class="form-control" required>
+                                @foreach($lectures as $lecture)
+                                    <option value="{{ $lecture->id }}" @if($lecture->id == $data->lecture_id) selected @endif>
+                                        {{ $lecture->name }}
                                     </option>
                                 @endforeach
                             </select>

@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('clas_id');
             $table->foreign('clas_id')->references('id')->on('clas')->onDelete('cascade');
-            $table->unsignedBigInteger('lesson_id')->nullable();
-            $table->foreign('lesson_id')->references('id')->on('lessons')->onDelete('cascade');
+            $table->unsignedBigInteger('lecture_id')->nullable();
+            $table->foreign('lecture_id')->references('id')->on('lectures')->onDelete('cascade');
             $table->unsignedBigInteger('teacher_id');
             $table->foreign('teacher_id')->references('id')->on('teachers')->onDelete('cascade');
             $table->unsignedBigInteger('type'); // 1 quran //2 manhg //3 extra

@@ -4,9 +4,6 @@ namespace App\Http\Controllers\Api\v1\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Advertisement;
-use App\Models\ClassDateLesson;
-use App\Models\ClassLesson;
-use App\Models\ClassTeacher;
 use App\Models\Lecture;
 use App\Models\Clas;
 use App\Models\LectureClassDate;

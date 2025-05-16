@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('name'); // e.g., First Exam, Second Exam, Final Exam
             $table->unsignedBigInteger('clas_id'); // Class the exam belongs to
             $table->foreign('clas_id')->references('id')->on('clas')->onDelete('cascade');
-            $table->unsignedBigInteger('lesson_id'); 
-            $table->foreign('lesson_id')->references('id')->on('lessons')->onDelete('cascade');
+            $table->unsignedBigInteger('lecture_id'); 
+            $table->foreign('lecture_id')->references('id')->on('lectures')->onDelete('cascade');
             $table->date('exam_date'); // Date of the exam
             $table->timestamps();
         });

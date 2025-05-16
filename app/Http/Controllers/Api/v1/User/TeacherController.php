@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Api\v1\User;
 use App\Http\Controllers\Controller;
 use App\Models\Advertisement;
 use App\Models\Attendance;
-use App\Models\ClassDateLesson;
-use App\Models\ClassLesson;
 use App\Models\ClassTeacher;
 use App\Models\Homework;
 use App\Models\HomeworkStudent;
@@ -14,9 +12,11 @@ use App\Models\Interaction;
 use App\Models\Rating;
 use App\Models\Exam;
 use App\Models\Grade;
+use App\Models\LectureClassDate;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+
 
 class TeacherController extends Controller
 {
@@ -42,8 +42,8 @@ class TeacherController extends Controller
     }
 
 
-    // Get all lessons for a specific class
-    public function getClassLessons($classId)
+    // Get all lectures for a specific class
+    public function getClassLectures($classId)
     {
         // Authenticate the teacher
         $teacher = auth()->user();
@@ -61,15 +61,35 @@ class TeacherController extends Controller
             return response(['message' => 'You are not assigned to this class'], 403);
         }
 
-        // Retrieve the lessons for the class
-        $lessons = ClassLesson::where('clas_id', $classId)
-            ->with('lesson') // Assuming a relationship exists in the ClassLesson model
-            ->get()
-            ->pluck('lesson'); // Retrieve only the lesson details
+        // Get all lectures for this class with their dates
+        $lectureDates = LectureClassDate::with('lecture')
+            ->where('class_id', $classId)
+            ->orderBy('date', 'asc')
+            ->get();
+        
+        // Format the response data
+        $lectures = $lectureDates->map(function($lectureDate) {
+            return [
+                'lecture_date_id' => $lectureDate->id,
+                'date' => $lectureDate->formatted_date,
+                'lecture' => [
+                    'id' => $lectureDate->lecture->id,
+                    'type' => $lectureDate->lecture->type,
+                    'content_teacher' => $lectureDate->lecture->content_teacher,
+                    'content_student' => $lectureDate->lecture->content_student,
+                    'video' => $lectureDate->lecture->video,
+                    'created_at' => $lectureDate->lecture->created_at,
+                    'updated_at' => $lectureDate->lecture->updated_at
+                ],
+                'is_past' => \Carbon\Carbon::parse($lectureDate->date)->isPast(),
+                'is_today' => \Carbon\Carbon::parse($lectureDate->date)->isToday()
+            ];
+        });
 
-        // Return the lessons
+        // Return the lectures
         return response([
-            'lessons' => $lessons,
+            'success' => true,
+            'lectures' => $lectures,
         ], 200);
     }
 
@@ -181,7 +201,7 @@ class TeacherController extends Controller
         // Validate the input data
         $request->validate([
             'clas_id' => 'required|exists:clas,id',
-            'lesson_id' => 'required|exists:lessons,id',
+            'lecture_id' => 'required|exists:lectures,id',
             'type' => 'required|in:1,2,3', // 1: Quran, 2: Manhag, 3: Extra
             'name_of_sura' => 'nullable|string',
             'from' => 'nullable|string',
@@ -205,7 +225,7 @@ class TeacherController extends Controller
         // Create the homework
         $homework = Homework::create([
             'clas_id' => $request->clas_id,
-            'lesson_id' => $request->lesson_id,
+            'lecture_id' => $request->lecture_id,
             'teacher_id' => $teacher->teacher->id,
             'type' => $request->type,
             'name_of_sura' => $request->name_of_sura,
@@ -238,12 +258,12 @@ class TeacherController extends Controller
     }
 
 
-  public function getHomeworksForLastLesson(Request $request)
+    public function getHomeworksForLastLecture(Request $request)
     {
         // Validate the input
         $request->validate([
             'clas_id' => 'required|exists:clas,id',
-            'lesson_id' => 'required|exists:lessons,id',
+            'lecture_id' => 'required|exists:lectures,id',
             'type' => 'required|in:all,special', // 'all' for all users, 'special' for specific users
         ]);
 
@@ -259,24 +279,20 @@ class TeacherController extends Controller
             return response(['message' => 'You are not assigned to this class'], 403);
         }
 
-        // Get the last lesson's date for the specified class
-         $lastLessonDate = ClassDateLesson::whereHas('classDate', function ($query) use ($request) {
-            $query->where('lesson_id', $request->lesson_id)
-                  ->where('week_date', '<', now()->toDateString()); // Filter before today
-        })
-        ->orderByDesc('class_dates.week_date') // Order by the most recent date before today
-        ->join('class_dates', 'class_date_lessons.class_date_id', '=', 'class_dates.id')
-        ->select('class_date_lessons.*', 'class_dates.week_date')
-        ->first();
+        // Get the last lecture's date for the specified class
+        $today = Carbon::today();
+        $lastLectureDate = LectureClassDate::where('class_id', $request->clas_id)
+            ->where('date', '<', $today)
+            ->orderBy('date', 'desc')
+            ->first();
 
-       // return  $lastLessonDate;
-        if (!$lastLessonDate) {
-            return response(['message' => 'No lessons found for this class before today'], 404);
+        if (!$lastLectureDate) {
+            return response(['message' => 'No lectures found for this class before today'], 404);
         }
 
-        // Query homeworks for the last lesson
+        // Query homeworks for the last lecture
         $query = Homework::where('clas_id', $request->clas_id)
-            ->where('lesson_id', $lastLessonDate->lesson_id) // Match the last lesson
+            ->where('lecture_id', $lastLectureDate->lecture_id) // Match the last lecture
             ->with('homeworkStudents.user');
 
         // Apply type filter
@@ -287,11 +303,11 @@ class TeacherController extends Controller
         $homeworks = $query->get();
 
         if ($homeworks->isEmpty()) {
-            return response(['message' => 'No homework found for the last lesson'], 404);
+            return response(['message' => 'No homework found for the last lecture'], 404);
         }
 
         return response([
-            'last_lesson_date' => $lastLessonDate->week_date,
+            'last_lecture_date' => $lastLectureDate->formatted_date,
             'homeworks' => $homeworks,
         ], 200);
     }
@@ -342,14 +358,14 @@ class TeacherController extends Controller
         return response(['data' => $data], 200);
     }
 
-     public function storeExam(Request $request)
+    public function storeExam(Request $request)
     {
         try {
             // Validate incoming request
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
                 'clas_id' => 'required|exists:clas,id',
-                'lesson_id' => 'required|exists:lessons,id',
+                'lecture_id' => 'required|exists:lectures,id',
                 'exam_date' => 'required|date',
             ]);
 
@@ -382,7 +398,7 @@ class TeacherController extends Controller
             'users' => 'required|array',
             'users.*.name' => 'required|string|max:255',
             'users.*.grade' => 'required',
-            'users.*.lesson_id' => 'required|exists:lessons,id',
+            'users.*.lecture_id' => 'required|exists:lectures,id',
             'users.*.clas_id' => 'required|exists:clas,id',
             'users.*.user_id' => 'required|exists:users,id',
         ]);
@@ -393,7 +409,7 @@ class TeacherController extends Controller
             $grades[] = Grade::create([
                 'name' => $userData['name'],
                 'grade' => $userData['grade'],
-                'lesson_id' => $userData['lesson_id'],
+                'lecture_id' => $userData['lecture_id'],
                 'clas_id' => $userData['clas_id'],
                 'user_id' => $userData['user_id'],
             ]);
@@ -415,10 +431,4 @@ class TeacherController extends Controller
 
         return response()->json(['message' => 'Grade deleted successfully']);
     }
-
-
-
-
-
-
 }

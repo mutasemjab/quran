@@ -22,9 +22,9 @@ class Homework extends Model
         return $this->belongsTo(Teacher::class, 'teacher_id');
     }
 
-    public function lesson()
+    public function lecture()
     {
-        return $this->belongsTo(Lesson::class, 'lesson_id');
+        return $this->belongsTo(Lecture::class, 'lecture_id');
     }
 
     public function homeworkStudents()

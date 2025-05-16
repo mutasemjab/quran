@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Clas;
 use App\Models\Lecture;
 use App\Models\LectureClassDate;
-use App\Models\Lesson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 

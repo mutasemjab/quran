@@ -10,7 +10,6 @@ use App\Http\Controllers\Api\v1\User\AttendanceController;
 use App\Http\Controllers\Api\v1\User\ExamController;
 use App\Http\Controllers\Api\v1\User\GradeController;
 use App\Http\Controllers\Api\v1\User\ClasController;
-use App\Http\Controllers\Api\v1\User\NoteStudentController;
 use App\Http\Controllers\Api\v1\User\StudentController;
 use App\Http\Controllers\Api\v1\User\WorkPaperController;
 use App\Http\Controllers\Api\v1\User\UploadPhotoVoiceController;
@@ -60,21 +59,20 @@ Route::group(['prefix' => 'v1/user'], function () {
 
         // Teacher
         Route::get('/teacher/classes', [TeacherController::class, 'getClasses']);
-        Route::get('/teacher/classes/{classId}/lessons', [TeacherController::class, 'getClassLessons']);
+        Route::get('/teacher/classes/{classId}/lectures', [TeacherController::class, 'getClassLectures']);
         Route::post('/class/users', [TeacherController::class, 'getUsersByClass']);
         Route::post('/class/attendance', [TeacherController::class, 'recordAttendance']);
         Route::post('/class/ratings', [TeacherController::class, 'recordRatings']);
         Route::post('/class/homework', [TeacherController::class, 'createHomework']);
-        Route::post('/class/homeworks/last-lesson', [TeacherController::class, 'getHomeworksForLastLesson']);
+        Route::post('/class/homeworks/last-lecture', [TeacherController::class, 'getHomeworksForLastLecture']);
         Route::post('/interactions/class', [TeacherController ::class, 'getInteractionsByClass']);
         Route::post('/exams', [TeacherController::class, 'storeExam']);
         Route::post('/grades', [TeacherController::class, 'store']);
         Route::delete('/grades/{id}', [TeacherController::class, 'destroy']);
 
-        // CLASSES AND LESSONS
+        // CLASSES AND Lectures
         Route::get('/next-lecture/{classId}', [ClasController::class, 'getNextLecture']);
         Route::get('/class/{classId}/lectures', [ClasController::class, 'getAllLectures']);
-        Route::post('/lesson/lectures', [ClasController::class, 'getLessonLectures']);
          Route::get('/classess', [ClasController::class, 'getClassess']);
 
 
@@ -91,7 +89,7 @@ Route::group(['prefix' => 'v1/user'], function () {
         //Students
         Route::post('/interactions/store', [StudentController::class, 'storeInteraction']);
         Route::get('/getAthkar', [StudentController::class, 'getAthkar']);
-        Route::get('/class/{clas_id}/lessons', [StudentController::class, 'getClassLessons']);
+        Route::get('/class/{clas_id}/lectures', [StudentController::class, 'getClassLectures']);
         Route::get('/getSeera', [StudentController::class, 'getSeera']);
         Route::get('/getHomeworks', [StudentController::class, 'getHomeworks']);
         Route::post('/homework-answer', [StudentController::class, 'store']);

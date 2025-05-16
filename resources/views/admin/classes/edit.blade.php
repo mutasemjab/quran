@@ -45,46 +45,7 @@
 
             <hr>
 
-            <h4>{{ __('messages.Weekly Dates') }}</h4>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>{{ __('messages.Week Date') }}</th>
-                        <th>{{ __('messages.Lesson') }}</th>
-                        <th>{{ __('messages.Action') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($weeklyDates as $weeklyDate)
-                        <tr>
-                            <td>{{ $weeklyDate->week_date }}</td>
-                            <td>
-                                <form action="{{ route('class.assignLesson', $weeklyDate->id) }}" method="POST">
-                                    @csrf
-                                    <select name="lesson_id" class="form-control">
-                                        <option value="">{{ __('messages.Select Lesson') }}</option>
-                                        @foreach ($lessons as $lesson)
-                                            <option value="{{ $lesson->id }}"
-                                                @if ($weeklyDate->lessons->pluck('lesson_id')->contains($lesson->id)) selected @endif>
-                                                {{ $lesson->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    
-                                    <button type="submit" class="btn btn-primary btn-sm mt-1">{{ __('messages.Assign') }}</button>
-                                </form>
-                            </td>
-                            <td>
-                                <form action="{{ route('class.removeWeeklyDate', $weeklyDate->id) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">{{ __('messages.Remove') }}</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+       
         </div>
     </div>
 @endsection

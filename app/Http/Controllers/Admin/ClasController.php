@@ -87,14 +87,8 @@ class ClasController extends Controller
         if (auth()->user()->can('class-edit')) {
             $data = Clas::findOrFail($id);
     
-            // Retrieve weekly dates and their associated lessons
-            $weeklyDates = ClassDate::where('clas_id', $id)
-                ->with('lessons.lesson') // Fetch lessons for each date
-                ->get();
     
-            $lessons = Lesson::all(); // Get all lessons for the select dropdown
-    
-            return view('admin.classes.edit', compact('data', 'weeklyDates', 'lessons'));
+            return view('admin.classes.edit', compact('data'));
         } else {
             return redirect()->back()
                 ->with('error', "Access Denied");
@@ -147,24 +141,7 @@ class ClasController extends Controller
             }
         }
 
-        public function assignLesson(Request $request, $id)
-        {
-            if (auth()->user()->can('class-edit')) {
-                $request->validate([
-                    'lesson_id' => 'required|exists:lessons,id',
-                ]);
-
-                ClassDateLesson::create([
-                    'class_date_id' => $id,
-                    'lesson_id' => $request->lesson_id,
-                ]);
-
-                return redirect()->back()->with('success', 'Lesson assigned to the date successfully');
-            } else {
-                return redirect()->back()
-                    ->with('error', "Access Denied");
-            }
-        }
+    
 
 
     public function destroy($id)

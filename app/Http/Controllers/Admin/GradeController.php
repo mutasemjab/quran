@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Clas;
 use App\Models\Grade;
-use App\Models\Lesson;
+use App\Models\Lecture;
+use App\Models\lecture;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -27,14 +28,14 @@ class GradeController extends Controller
         // Fetch all classes for the dropdown
         $classes = Clas::all(); // Replace `Clas` with your actual model for classes
 
-        // Fetch all lessons for the dropdown
-        $lessons = Lesson::all(); // Replace `Lesson` with your actual model for lessons
+        // Fetch all lectures for the dropdown
+        $lectures = Lecture::all(); // Replace `lecture` with your actual model for lectures
 
         // Fetch all students for the dropdown
         $users = User::where('user_type', 1)->get(); // Assuming user_type 1 is for students
 
         // Return the edit view with the fetched data
-        return view('admin.grades.edit', compact('data', 'classes', 'lessons', 'users'));
+        return view('admin.grades.edit', compact('data', 'classes', 'lectures', 'users'));
     }
 
     public function update(Request $request, $id)
@@ -43,7 +44,7 @@ class GradeController extends Controller
             'name' => 'required|string|max:255',
             'grade' => 'required|numeric|min:0|max:100', // Example: Grade between 0 and 100
             'clas' => 'required|exists:clas,id', // Ensure class ID exists in the `clas` table
-            'lesson' => 'required|exists:lessons,id', // Ensure lesson ID exists in the `lessons` table
+            'lecture' => 'required|exists:lectures,id', // Ensure lecture ID exists in the `lectures` table
             'user' => 'required|exists:users,id', // Ensure student ID exists in the `users` table
         ]);
 
@@ -55,7 +56,7 @@ class GradeController extends Controller
             'name' => $validated['name'],
             'grade' => $validated['grade'],
             'clas_id' => $validated['clas'],
-            'lesson_id' => $validated['lesson'],
+            'lecture_id' => $validated['lecture'],
             'user_id' => $validated['user'],
         ]);
 

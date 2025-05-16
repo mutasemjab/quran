@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Api\v1\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Athkar;
-use App\Models\ClassDate;
-use App\Models\ClassDateLesson;
+
 use App\Models\Exam;
 use App\Models\Game;
 use App\Models\Homework;
 use App\Models\HomeworkAnswer;
 use App\Models\Interaction;
+use App\Models\LectureClassDate;
 use App\Models\Seera;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -65,40 +65,61 @@ class StudentController extends Controller
         return response()->json(['data' => $data]);
     }
 
-    public function getClassLessons($clas_id)
+   public function getClassLectures($clas_id)
     {
-        // Retrieve class dates for the given class ID
-        $classDates = ClassDate::where('clas_id', $clas_id)->orderBy('week_date', 'asc')->get();
+        // Retrieve lecture class dates for the given class ID
+        $lectureDates = LectureClassDate::where('class_id', $clas_id)
+            ->with('lecture')  // Eager load the lecture relationship
+            ->orderBy('date', 'asc')
+            ->get();
 
-        if ($classDates->isEmpty()) {
-            return response()->json(['message' => 'No lessons found for this class.'], 404);
+        if ($lectureDates->isEmpty()) {
+            return response()->json(['message' => 'No lectures found for this class.'], 404);
         }
 
         $data = [];
+        $currentDate = null;
+        $dateGroup = [];
 
-        foreach ($classDates as $classDate) {
-            $lessons = ClassDateLesson::where('class_date_id', $classDate->id)
-                ->with(['lesson', 'lesson.lectures'])
-                ->get();
-
-            $lessonDetails = $lessons->map(function ($classLesson) {
-                return [
-                    'lesson_id' => $classLesson->lesson->id,
-                    'lesson_name' => $classLesson->lesson->name,
-                    'lectures' => $classLesson->lesson->lectures->map(function ($lecture) {
-                        return [
-                            'lecture_id' => $lecture->id,
-                            'type' => $lecture->type, // 1: Quran, 2: Hadeth, 3: Manhag
-                            'content' => $lecture->content,
-                            'video' => $lecture->video,
-                        ];
-                    }),
-                ];
-            });
-
+        // Group lectures by date
+        foreach ($lectureDates as $lectureDate) {
+            $formattedDate = $lectureDate->formatted_date;
+            
+            // If we encounter a new date, create a new group
+            if ($currentDate !== $formattedDate) {
+                // Add the previous group to our data array if it's not empty
+                if (!empty($dateGroup)) {
+                    $data[] = [
+                        'date' => $currentDate,
+                        'lectures' => $dateGroup,
+                        'is_past' => \Carbon\Carbon::parse($currentDate)->isPast(),
+                        'is_today' => \Carbon\Carbon::parse($currentDate)->isToday()
+                    ];
+                }
+                
+                // Start a new group
+                $currentDate = $formattedDate;
+                $dateGroup = [];
+            }
+            
+            // Add the lecture to the current date group
+            $dateGroup[] = [
+                'lecture_date_id' => $lectureDate->id,
+                'lecture_id' => $lectureDate->lecture->id,
+                'type' => $lectureDate->lecture->type, // 1: Quran, 2: Hadeth, 3: Manhag
+                'content_student' => $lectureDate->lecture->content_student,
+                'content_teacher' => $lectureDate->lecture->content_teacher,
+                'video' => $lectureDate->lecture->video,
+            ];
+        }
+        
+        // Add the last group if it exists
+        if (!empty($dateGroup)) {
             $data[] = [
-                'week_date' => $classDate->week_date,
-                'lessons' => $lessonDetails
+                'date' => $currentDate,
+                'lectures' => $dateGroup,
+                'is_past' => \Carbon\Carbon::parse($currentDate)->isPast(),
+                'is_today' => \Carbon\Carbon::parse($currentDate)->isToday()
             ];
         }
 
@@ -126,7 +147,7 @@ class StudentController extends Controller
 
         // Query homeworks for the given class
         $query = Homework::where('clas_id', $request->clas_id)
-            ->with('lesson') // Assuming there's a Lesson relationship
+            ->with('lecture') // Assuming there's a lecture relationship
             ->with(['homeworkStudents' => function ($query) use ($request) {
                 $query->where('user_id', $request->user_id);
             }]);
@@ -154,7 +175,7 @@ class StudentController extends Controller
                 'to' => $homework->to,
                 'description' => $homework->type == 2 ? $homework->description_manhag : ($homework->type == 3 ? $homework->description_extra : null),
                 'status' => $homework->status == 1 ? 'Done' : 'Not Yet',
-                'lesson_id' => $homework->lesson_id,
+                'lecture_id' => $homework->lecture_id,
                 'teacher_id' => $homework->teacher_id,
                 'assigned_to' => $homework->homeworkStudents->pluck('user_id')->toArray(),
             ];

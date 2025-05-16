@@ -83,13 +83,47 @@ class ClasController extends Controller
     public function edit($id)
     {
         if (auth()->user()->can('class-edit')) {
-            $class = Clas::findOrFail($id);
-            $weekDays = Clas::WEEKDAYS;
-
-            return view('admin.classes.edit', compact('class', 'weekDays'));
+            try {
+                // Find the class
+                $class = Clas::findOrFail($id);
+                
+                // Get weekdays
+                $weekDays = Clas::WEEKDAYS;                
+                // Get selected days from JSON
+                $selectedDays = json_decode($class->week_days, true) ?? [];
+                
+                // Get selected holidays from JSON
+                $selectedHolidays = json_decode($class->holidays, true) ?? [];
+                
+                // Generate all possible holiday dates based on selected days
+                $holidayDates = [];
+                if (!empty($selectedDays) && $class->start_date && $class->finish_date) {
+                    $startDate = \Carbon\Carbon::parse($class->start_date);
+                    $endDate = \Carbon\Carbon::parse($class->finish_date);
+                    
+                    $currentDate = clone $startDate;
+                    while ($currentDate->lte($endDate)) {
+                        $dayName = $currentDate->format('l'); // Get day name (Monday, Tuesday, etc.)
+                        if (in_array($dayName, $selectedDays)) {
+                            $holidayDates[] = $currentDate->format('Y-m-d');
+                        }
+                        $currentDate->addDay();
+                    }
+                }
+                
+                return view('admin.classes.edit', compact(
+                    'class', 
+                    'weekDays', 
+                    'selectedDays', 
+                    'holidayDates', 
+                    'selectedHolidays'
+                ));
+            } catch (\Exception $ex) {
+                return redirect()->route('class.index')
+                    ->with(['error' => 'An error occurred: ' . $ex->getMessage()]);
+            }
         } else {
-            return redirect()->back()
-                ->with('error', "Access Denied");
+            return redirect()->back()->with('error', "Access Denied");
         }
     }
 

@@ -28,14 +28,7 @@
                 </div>
             </div>
             <div class="row mb-3">
-                <div class="col-md-6">
-                    <h5>{{ __('messages.Search and Select Brothers') }}</h5>
-                    <ul class="list-group">
-                        @foreach($currentBrothers as $brother)
-                            <li class="list-group-item">{{ $brother->name }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+                
                 <div class="col-md-6">
                     <h5>{{ __('messages.Photo') }}</h5>
                     @if ($student->photo)

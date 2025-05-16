@@ -83,10 +83,10 @@ class ClasController extends Controller
     public function edit($id)
     {
         if (auth()->user()->can('class-edit')) {
-            $data = Clas::findOrFail($id);
+            $class = Clas::findOrFail($id);
             $weekDays = Clas::WEEKDAYS;
 
-            return view('admin.classes.edit', compact('data', 'weekDays'));
+            return view('admin.classes.edit', compact('class', 'weekDays'));
         } else {
             return redirect()->back()
                 ->with('error', "Access Denied");

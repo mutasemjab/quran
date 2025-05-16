@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class ClasController extends Controller
 {
-    
+
     public function index()
     {
 
@@ -22,7 +22,7 @@ class ClasController extends Controller
     {
         if (auth()->user()->can('class-add')) {
             $weekDays = Clas::WEEKDAYS;
-        return view('admin.classes.create',compact('weekDays'));
+            return view('admin.classes.create', compact('weekDays'));
         } else {
             return redirect()->back()
                 ->with('error', "Access Denied");
@@ -51,12 +51,12 @@ class ClasController extends Controller
                 $class->finish_date = $request->get('finish_date');
                 $class->week_days = json_encode($request->get('day_ids'));
                 $class->holidays = json_encode($request->get('holidays_ids'));
-    
+
                 if ($class->save()) {
                     // Generate weekly dates
                     $startDate = \Carbon\Carbon::parse($class->start_date);
                     $endDate = \Carbon\Carbon::parse($class->finish_date);
-    
+
                     while ($startDate->lte($endDate)) {
                         ClassDate::create([
                             'clas_id' => $class->id,
@@ -64,7 +64,7 @@ class ClasController extends Controller
                         ]);
                         $startDate->addWeek(); // Increment by one week
                     }
-    
+
                     return redirect()->route('class.index')->with(['success' => 'Class created with weekly dates generated']);
                 } else {
                     return redirect()->back()->with(['error' => 'Something went wrong']);
@@ -78,68 +78,92 @@ class ClasController extends Controller
             return redirect()->back()->with('error', "Access Denied");
         }
     }
-    
+
 
     public function edit($id)
     {
         if (auth()->user()->can('class-edit')) {
             $data = Clas::findOrFail($id);
-    
-    
-            return view('admin.classes.edit', compact('data'));
+            $weekDays = Clas::WEEKDAYS;
+
+            return view('admin.classes.edit', compact('data', 'weekDays'));
         } else {
             return redirect()->back()
                 ->with('error', "Access Denied");
         }
     }
-    
 
-         public function update(Request $request, $id)
-        {
-            if (auth()->user()->can('class-edit')) {
+
+    public function update(Request $request, $id)
+    {
+        if (auth()->user()->can('class-edit')) {
+            try {
+                // Find the class
                 $class = Clas::findOrFail($id);
 
-                try {
-                    // Validate input data
-                    $request->validate([
-                        'name' => 'required|string|max:255',
-                    ]);
+                // Validate the input
+                $request->validate([
+                    'name' => 'required|string|max:255',
+                    'start_date' => 'required|date',
+                    'finish_date' => 'required|date|after_or_equal:start_date',
+                    'day_ids' => 'required|array',
+                    'holidays_ids' => 'array',
+                ]);
 
-                    // Update class name
-                    $class->name = $request->get('name');
+                // Update class attributes
+                $class->name = $request->get('name');
+                $class->start_date = $request->get('start_date');
+                $class->finish_date = $request->get('finish_date');
+                $class->week_days = json_encode($request->get('day_ids'));
+                $class->holidays = json_encode($request->get('holidays_ids'));
 
-                    if ($class->save()) {
-                        return redirect()->route('class.index')->with(['success' => 'Class updated successfully']);
-                    } else {
-                        return redirect()->back()->with(['error' => 'Something went wrong']);
+                if ($class->save()) {
+                    // Delete existing class dates
+                    ClassDate::where('clas_id', $class->id)->delete();
+
+                    // Regenerate weekly dates
+                    $startDate = \Carbon\Carbon::parse($class->start_date);
+                    $endDate = \Carbon\Carbon::parse($class->finish_date);
+
+                    while ($startDate->lte($endDate)) {
+                        ClassDate::create([
+                            'clas_id' => $class->id,
+                            'week_date' => $startDate->toDateString(),
+                        ]);
+                        $startDate->addWeek(); // Increment by one week
                     }
-                } catch (\Exception $ex) {
-                    return redirect()->back()
-                        ->with(['error' => 'An error occurred: ' . $ex->getMessage()])
-                        ->withInput();
+
+                    return redirect()->route('class.index')->with(['success' => 'Class updated with weekly dates regenerated']);
+                } else {
+                    return redirect()->back()->with(['error' => 'Something went wrong']);
                 }
-            } else {
-                return redirect()->back()->with('error', "Access Denied");
-            }
-        }
-
-
-        public function removeWeeklyDate($id)
-        {
-            if (auth()->user()->can('class-edit')) {
-                $classDate = ClassDate::findOrFail($id);
-
-                // Delete the date and associated 
-                $classDate->delete();
-
-                return redirect()->back()->with('success', 'Weekly date removed successfully');
-            } else {
+            } catch (\Exception $ex) {
                 return redirect()->back()
-                    ->with('error', "Access Denied");
+                    ->with(['error' => 'An error occurred: ' . $ex->getMessage()])
+                    ->withInput();
             }
+        } else {
+            return redirect()->back()->with('error', "Access Denied");
         }
+    }
 
-    
+
+    public function removeWeeklyDate($id)
+    {
+        if (auth()->user()->can('class-edit')) {
+            $classDate = ClassDate::findOrFail($id);
+
+            // Delete the date and associated 
+            $classDate->delete();
+
+            return redirect()->back()->with('success', 'Weekly date removed successfully');
+        } else {
+            return redirect()->back()
+                ->with('error', "Access Denied");
+        }
+    }
+
+
 
 
     public function destroy($id)
@@ -164,6 +188,4 @@ class ClasController extends Controller
 
         return response()->json($dates);
     }
-
-
 }

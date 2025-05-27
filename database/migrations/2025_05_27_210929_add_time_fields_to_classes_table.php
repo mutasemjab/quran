@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('classes', function (Blueprint $table) {
+        Schema::table('clas', function (Blueprint $table) {
         $table->time('time_from')->nullable();
         $table->time('time_to')->nullable();
         });
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('classes', function (Blueprint $table) {
+        Schema::table('clas', function (Blueprint $table) {
            $table->dropColumn('time_from');
            $table->dropColumn('time_to');
         });

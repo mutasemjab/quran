@@ -39,6 +39,8 @@ class ClasController extends Controller
                 $request->validate([
                     'name' => 'required|string|max:255',
                     'start_date' => 'required|date',
+                    'time_from' => 'required',
+                    'time_to' => 'required',
                     'finish_date' => 'required|date|after_or_equal:start_date',
                     'day_ids' => 'required|array',
                     'holidays_ids' => 'array',
@@ -49,6 +51,8 @@ class ClasController extends Controller
                 $class->name = $request->get('name');
                 $class->start_date = $request->get('start_date');
                 $class->finish_date = $request->get('finish_date');
+                $class->time_from = $request->input('time_from');
+                $class->time_to = $request->input('time_to');
                 $class->week_days = json_encode($request->get('day_ids'));
                 $class->holidays = json_encode($request->get('holidays_ids'));
 
@@ -139,6 +143,8 @@ class ClasController extends Controller
                 $request->validate([
                     'name' => 'required|string|max:255',
                     'start_date' => 'required|date',
+                    'time_from' => 'required',
+                    'time_to' => 'required',
                     'finish_date' => 'required|date|after_or_equal:start_date',
                     'day_ids' => 'required|array',
                     'holidays_ids' => 'array',
@@ -148,6 +154,8 @@ class ClasController extends Controller
                 $class->name = $request->get('name');
                 $class->start_date = $request->get('start_date');
                 $class->finish_date = $request->get('finish_date');
+                $class->time_from = $request->input('time_from');
+                $class->time_to = $request->input('time_to');
                 $class->week_days = json_encode($request->get('day_ids'));
                 $class->holidays = json_encode($request->get('holidays_ids'));
 

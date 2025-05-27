@@ -47,6 +47,27 @@
                             @enderror
                         </div>
                     </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>{{ __('messages.Time From') }}</label>
+                            <input type="time" name="time_from" class="form-control" value="{{ old('time_from', $class->time_from) }}">
+                            @error('time_from')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>{{ __('messages.Time To') }}</label>
+                            <input type="time" name="time_to" class="form-control" value="{{ old('time_to', $class->time_to) }}">
+                            @error('time_to')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
                     
                     <div class="col-md-6">
                         <div class="form-group">
@@ -59,16 +80,22 @@
                         </div>
                     </div>
                     
-                    <div class="col-md-6">
+                  <div class="col-md-6">
                         <div class="form-group">
                             <label for="holidays_ids" class="form-label">{{ __('messages.Select Holidays') }}</label>
-                            <select name="holidays_ids[]" id="holidays_ids" class="form-control select2" multiple="multiple" style="width: 100%;">
+                            <div id="holiday-checkboxes">
                                 @foreach($holidayDates as $date)
-                                    <option value="{{ $date }}" {{ in_array($date, $selectedHolidays ?? []) ? 'selected' : '' }}>{{ $date }}</option>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="holidays_ids[]" value="{{ $date }}"
+                                            {{ in_array($date, $selectedHolidays ?? []) ? 'checked' : '' }} id="holiday_{{ $loop->index }}">
+                                        <label class="form-check-label" for="holiday_{{ $loop->index }}">{{ $date }}</label>
+                                    </div>
                                 @endforeach
-                            </select>
+                            </div>
                         </div>
                     </div>
+
+
 
                     <div class="col-md-12">
                         <div class="form-group text-center">
@@ -147,15 +174,20 @@ $(document).ready(function () {
                     _token: '{{ csrf_token() }}'
                 },
                 success: function (dates) {
-                    let options = '';
+                 let checkboxes = '';
                     const selectedHolidays = {!! json_encode($selectedHolidays ?? []) !!};
-                    
-                    dates.forEach(function (date) {
-                        const isSelected = selectedHolidays.includes(date) ? 'selected' : '';
-                        options += `<option value="${date}" ${isSelected}>${date}</option>`;
+
+                    dates.forEach(function (date, index) {
+                        const isChecked = selectedHolidays.includes(date) ? 'checked' : '';
+                        checkboxes += `
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="holidays_ids[]" value="${date}" id="holiday_${index}" ${isChecked}>
+                                <label class="form-check-label" for="holiday_${index}">${date}</label>
+                            </div>`;
                     });
 
-                    $('#holidays_ids').html(options).trigger('change');
+                    $('#holiday-checkboxes').html(checkboxes);
+
                 },
                 error: function () {
                     alert('Could not fetch holiday dates.');

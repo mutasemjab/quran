@@ -11,19 +11,46 @@ use Illuminate\Support\Facades\File;
 
 class LectureController extends Controller
 {
-    public function index()
+
+    public function index(Request $request)
     {
+        $query = Lecture::with(['classDates.clas']);
 
-        $data = Lecture::get();
+        // Filter by class ID
+        if ($request->has('class_id') && $request->class_id != '') {
+            $query->whereHas('classDates', function ($q) use ($request) {
+                $q->where('class_id', $request->class_id);
+            });
+        }
 
-        return view('admin.lectures.index', ['data' => $data]);
+        // Filter by date
+        if ($request->has('date') && $request->date != '') {
+            $query->whereHas('classDates', function ($q) use ($request) {
+                $q->where('date', $request->date);
+            });
+        }
+
+        $data = $query->get();
+        $classes = \App\Models\Clas::all(); // To populate the class dropdown
+
+        return view('admin.lectures.index', compact('data', 'classes'));
     }
+
 
     public function create()
     {
         if (auth()->user()->can('lecture-add')) {
             $classes = Clas::get();
-            return view('admin.lectures.create', compact('classes'));
+            $usedDates = \App\Models\LectureClassDate::with('lecture')
+                ->get()
+                ->groupBy(function ($item) {
+                    return $item->class_id . '-' . $item->lecture->type;
+                })
+                ->map(function ($group) {
+                    return $group->pluck('date')->toArray();
+                });
+
+            return view('admin.lectures.create', compact('classes', 'usedDates'));
         } else {
             return redirect()->back()
                 ->with('error', "Access Denied");

@@ -46,7 +46,26 @@
                             @enderror
                         </div>
                     </div>
-                    
+                      <div class="col-md-6">
+                        <div class="form-group">
+                            <label>{{ __('messages.Time From') }}</label>
+                            <input type="time" name="time_from" class="form-control" value="{{ old('time_from') }}">
+                            @error('time_from')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>{{ __('messages.Time To') }}</label>
+                            <input type="time" name="time_to" class="form-control" value="{{ old('time_to') }}">
+                            @error('time_to')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="day_ids" class="form-label">{{ __('messages.Select Days') }}</label>

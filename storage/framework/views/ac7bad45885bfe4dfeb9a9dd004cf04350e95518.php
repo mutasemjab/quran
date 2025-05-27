@@ -1,59 +1,81 @@
-@extends('layouts.admin')
-@section('title')
-{{ __('messages.lectures') }}
-@endsection
+<?php $__env->startSection('title'); ?>
+<?php echo e(__('messages.lectures')); ?>
+
+<?php $__env->stopSection(); ?>
 
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title card_title_center"> {{ __('messages.Add_New') }}  {{ __('messages.lectures') }} </h3>
+            <h3 class="card-title card_title_center"> <?php echo e(__('messages.Add_New')); ?>  <?php echo e(__('messages.lectures')); ?> </h3>
         </div>
         <!-- /.card-header -->
         <div class="card-body">
 
 
-            <form action="{{ route('lectures.store') }}" method="post" enctype='multipart/form-data'>
+            <form action="<?php echo e(route('lectures.store')); ?>" method="post" enctype='multipart/form-data'>
                 <div class="row">
-                    @csrf
+                    <?php echo csrf_field(); ?>
 
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label>  {{ __('messages.content For teacher') }} </label>
-                            <input name="content_teacher" id="content_teacher" class="form-control" value="{{ old('content_teacher') }}">
-                            @error('content')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                            <label>  <?php echo e(__('messages.content For teacher')); ?> </label>
+                            <input name="content_teacher" id="content_teacher" class="form-control" value="<?php echo e(old('content_teacher')); ?>">
+                            <?php $__errorArgs = ['content'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <span class="text-danger"><?php echo e($message); ?></span>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
                  
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label>  {{ __('messages.content For Student') }} </label>
-                            <input name="content_student" id="content_student" class="form-control" value="{{ old('content_student') }}">
-                            @error('content')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                            <label>  <?php echo e(__('messages.content For Student')); ?> </label>
+                            <input name="content_student" id="content_student" class="form-control" value="<?php echo e(old('content_student')); ?>">
+                            <?php $__errorArgs = ['content'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <span class="text-danger"><?php echo e($message); ?></span>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
                     </div>
 
                     <div class="col-md-6">
-                        <label for="type">{{ __('messages.Lecture Type') }}</label>
+                        <label for="type"><?php echo e(__('messages.Lecture Type')); ?></label>
                         <select name="type" id="type" class="form-control">
-                            <option value="1">{{ __('messages.Quran') }}</option>
-                            <option value="2">{{ __('messages.Hadeth') }}</option>
-                            <option value="3">{{ __('messages.Manhag') }}</option>
+                            <option value="1"><?php echo e(__('messages.Quran')); ?></option>
+                            <option value="2"><?php echo e(__('messages.Hadeth')); ?></option>
+                            <option value="3"><?php echo e(__('messages.Manhag')); ?></option>
                         </select>
-                        @error('type')
-                            <span class="text-danger">{{ $message }}</span>
-                        @enderror
+                        <?php $__errorArgs = ['type'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <span class="text-danger"><?php echo e($message); ?></span>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                     
 
                     <!-- Add Lecture Button -->
                     <div class="col-md-12" style="margin-top: 19px;">                        
                             <button type="button" class="btn btn-success" id="add-lecture-btn">
-                                + {{ __('messages.Add Lecture') }}
+                                + <?php echo e(__('messages.Add Lecture')); ?>
+
                             </button>                        
                     </div>
 
@@ -61,8 +83,8 @@
                     <table class="table" id="class-date-table">
                         <thead>
                             <tr>
-                                <th>{{ __('messages.Select classes') }}</th>
-                                <th>{{ __('messages.Select date') }}</th>
+                                <th><?php echo e(__('messages.Select classes')); ?></th>
+                                <th><?php echo e(__('messages.Select date')); ?></th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -71,9 +93,9 @@
                                 <td>
                                     <select name="classes[]" class="form-control class-dropdown">
                                         <option value="">-- Select Class --</option>
-                                        @foreach($classes as $class)
-                                            <option value="{{ $class->id }}">{{ $class->name }}</option>
-                                        @endforeach
+                                        <?php $__currentLoopData = $classes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $class): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <option value="<?php echo e($class->id); ?>"><?php echo e($class->name); ?></option>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </select>
                                 </td>
                                 <td>
@@ -87,14 +109,14 @@
                             </tr>
                         </tbody>
                     </table>
-                    @foreach($classes as $class)
-                        <span class="generated_dates" data-class="{{ $class->id }}" data-dates='@json($class->dates_without_holidays)' hidden></span>
-                    @endforeach
+                    <?php $__currentLoopData = $classes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $class): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <span class="generated_dates" data-class="<?php echo e($class->id); ?>" data-dates='<?php echo json_encode($class->dates_without_holidays, 15, 512) ?>' hidden></span>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                     <div class="col-md-12">
                         <div class="form-group text-center">
-                            <button id="do_add_item_cardd" type="submit" class="btn btn-primary btn-sm"> {{ __('messages.Submit') }}</button>
-                            <a href="{{ route('lectures.index') }}" class="btn btn-sm btn-danger">{{ __('messages.Cancel') }}</a>
+                            <button id="do_add_item_cardd" type="submit" class="btn btn-primary btn-sm"> <?php echo e(__('messages.Submit')); ?></button>
+                            <a href="<?php echo e(route('lectures.index')); ?>" class="btn btn-sm btn-danger"><?php echo e(__('messages.Cancel')); ?></a>
 
                         </div>
                     </div>
@@ -111,10 +133,10 @@
 
     </div>
     </div>
-@endsection
-@section('script')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('script'); ?>
 <script>
-    const usedDatesMap = @json($usedDates); // key = "classId-type"
+    const usedDatesMap = <?php echo json_encode($usedDates, 15, 512) ?>; // key = "classId-type"
 </script>
 
 <script>
@@ -186,7 +208,9 @@
         });
     });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
 
 
 
+
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\quran\resources\views/admin/lectures/create.blade.php ENDPATH**/ ?>
